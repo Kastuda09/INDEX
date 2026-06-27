@@ -3,118 +3,312 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AsusuAI</title>
+<title>AsusuAI — Decentralized Pool</title>
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,sans-serif;background:#0a0a0f;color:#f0f0ff;min-height:100vh;}
-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#12121a;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;z-index:100;}
-.logo{font-size:18px;font-weight:800;}.logo span{color:#a78bfa;}
-.wbtn{background:#1a1a26;border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;}
-.wbtn.on{color:#10b981;border-color:rgba(16,185,129,0.4);}
-.hero{text-align:center;padding:40px 20px 24px;}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;padding:4px 12px;border-radius:999px;font-size:12px;margin-bottom:12px;}
-.dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;}
+:root{--bg:#0a0a0f;--s1:#12121a;--s2:#1a1a26;--s3:#22223a;--border:rgba(255,255,255,0.08);--glow:rgba(139,92,246,0.35);--text:#f0f0ff;--muted:#8888aa;--accent:#7c3aed;--al:#a78bfa;--gold:#f59e0b;--green:#10b981;--red:#ef4444;}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.logo{font-size:18px;font-weight:800;}.logo span{color:var(--al);}
+.nav-links{display:flex;gap:4px;}
+.nl{background:none;border:none;color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;}
+.nl:hover{background:var(--s2);color:var(--text);}
+.nl.active{background:var(--s2);color:var(--al);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.bal{font-size:12px;color:var(--muted);}
+.wbtn{background:var(--s2);border:1px solid var(--glow);color:var(--al);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;}
+.wbtn.on{color:var(--green);border-color:rgba(16,185,129,0.4);}
+.page{display:none;}.page.active{display:block;}
+
+/* HERO */
+.hero{text-align:center;padding:48px 20px 28px;}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--al);padding:4px 12px;border-radius:999px;font-size:12px;margin-bottom:14px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-h1{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sub{color:#8888aa;font-size:15px;margin-bottom:20px;}
-.notice{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 16px;max-width:500px;margin:0 auto 24px;font-size:13px;color:#10b981;text-align:center;}
-.stats{display:flex;gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;max-width:700px;margin:0 auto 32px;}
-.stat{flex:1;background:#12121a;padding:14px;text-align:center;}
-.sv{font-size:20px;font-weight:700;}.sv.g{color:#10b981;}.sv.gold{color:#f59e0b;}.sv.a{color:#a78bfa;}
-.sl{font-size:11px;color:#8888aa;text-transform:uppercase;letter-spacing:0.4px;margin-top:3px;}
-.main{max-width:1000px;margin:0 auto;padding:0 20px 60px;}
-.sh{font-size:16px;font-weight:700;margin-bottom:16px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:40px;}
-.card{background:#12121a;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;}
-.card:hover{border-color:rgba(139,92,246,0.4);transform:translateY(-2px);}
+h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:8px;background:linear-gradient(135deg,#fff 40%,var(--al));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--muted);font-size:15px;margin-bottom:24px;}
+.stats{display:flex;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-width:700px;margin:0 auto 36px;}
+.stat{flex:1;background:var(--s1);padding:14px;text-align:center;}
+.sv{font-size:20px;font-weight:700;}.sv.g{color:var(--green);}.sv.gold{color:var(--gold);}.sv.a{color:var(--al);}
+.sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-top:3px;}
+
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:0 20px 60px;}
+.sh{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.sh i{color:var(--al);}
+
+/* POOLS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:40px;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;}
+.card:hover{border-color:var(--glow);transform:translateY(-2px);}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .t1::before{background:linear-gradient(90deg,#10b981,#06b6d4);}
 .t2::before{background:linear-gradient(90deg,#f59e0b,#ef4444);}
 .t3::before{background:linear-gradient(90deg,#7c3aed,#ec4899);}
 .t4::before{background:linear-gradient(90deg,#fff,#a78bfa);}
 .ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
-.ct{font-size:11px;font-weight:600;text-transform:uppercase;color:#8888aa;margin-bottom:3px;}
-.ca{font-size:22px;font-weight:800;}.ca span{font-size:13px;color:#8888aa;}
+.ct{font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.ca{font-size:22px;font-weight:800;}.ca span{font-size:13px;color:var(--muted);}
 .cs{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;}
-.open{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);}
-.fill{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);}
-.pl{display:flex;justify-content:space-between;font-size:11px;color:#8888aa;margin-bottom:5px;}
-.pb{height:5px;background:#22223a;border-radius:999px;overflow:hidden;margin-bottom:10px;}
+.cs.open{background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);}
+.cs.fill{background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25);}
+.pl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+.pb{height:5px;background:var(--s3);border-radius:999px;overflow:hidden;margin-bottom:10px;}
 .pf{height:100%;border-radius:999px;}
 .f1{background:linear-gradient(90deg,#10b981,#06b6d4);}
 .f2{background:linear-gradient(90deg,#f59e0b,#f97316);}
 .f3{background:linear-gradient(90deg,#7c3aed,#ec4899);}
 .f4{background:linear-gradient(90deg,#a78bfa,#fff);}
 .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.chip{font-size:10px;color:#8888aa;background:#1a1a26;border:1px solid rgba(255,255,255,0.07);padding:2px 8px;border-radius:999px;}
-.chip.gr{color:#10b981;}
-.tm{font-size:11px;color:#8888aa;margin-bottom:12px;}
-.tc{font-weight:700;color:#f0f0ff;}
-.jbtn{width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:#7c3aed;color:#fff;transition:background 0.2s;}
+.chip{font-size:10px;color:var(--muted);background:var(--s2);border:1px solid var(--border);padding:2px 8px;border-radius:999px;}
+.chip.gr{color:var(--green);}
+.tm{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.tc{font-weight:700;color:var(--text);}
+.jbtn{width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;background:var(--accent);color:#fff;transition:background 0.2s;}
 .jbtn:hover{background:#6d28d9;}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.step{background:#12121a;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;}
-.sn{font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.st{font-size:13px;font-weight:700;margin-bottom:4px;}
-.sd{font-size:11px;color:#8888aa;line-height:1.5;}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;}
+
+/* TICKETS */
+.ticket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:32px;}
+.ticket{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;}
+.ticket::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.ticket.active-t::before{background:var(--green);}
+.ticket.pending-t::before{background:var(--gold);}
+.ticket-num{font-size:28px;font-weight:800;color:var(--al);margin-bottom:2px;}
+.ticket-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+.ticket-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);}
+.ticket-row:last-child{border:none;}
+.tr-label{color:var(--muted);}
+.tr-val{font-weight:600;}
+.ticket-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;margin-top:10px;}
+.ts-active{background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);}
+.ts-pending{background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25);}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+.empty-state .big{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:14px;line-height:1.6;}
+
+/* WINNERS */
+.winners-table{width:100%;border-collapse:collapse;margin-bottom:32px;}
+.winners-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border);}
+.winners-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.winners-table tr:last-child td{border:none;}
+.winners-table tr:hover td{background:rgba(255,255,255,0.02);}
+.addr{font-family:monospace;font-size:12px;color:var(--al);}
+.amount-win{color:var(--green);font-weight:700;}
+.pool-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;}
+.pb-starter{background:rgba(16,185,129,0.12);color:var(--green);}
+.pb-growth{background:rgba(245,158,11,0.12);color:var(--gold);}
+.pb-elite{background:rgba(124,58,237,0.12);color:var(--al);}
+.pb-whale{background:rgba(255,255,255,0.08);color:#fff;}
+.tx-link{font-size:11px;color:var(--al);text-decoration:none;}
+.tx-link:hover{text-decoration:underline;}
+.winners-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px;}
+.wstat{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.wstat-val{font-size:22px;font-weight:700;margin-bottom:4px;}
+.wstat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+
+/* HOW TO PLAY */
+.how-hero{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-bottom:28px;}
+.how-hero h2{font-size:28px;font-weight:800;margin-bottom:8px;}
+.how-hero p{color:var(--muted);font-size:14px;max-width:500px;margin:0 auto;}
+.steps-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px;}
+.step-big{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;}
+.step-num-big{font-size:48px;font-weight:800;color:rgba(139,92,246,0.15);position:absolute;top:12px;right:16px;line-height:1;}
+.step-icon-big{font-size:28px;margin-bottom:10px;}
+.step-title-big{font-size:15px;font-weight:700;margin-bottom:6px;}
+.step-desc-big{font-size:12px;color:var(--muted);line-height:1.6;}
+.faq{margin-bottom:32px;}
+.faq-item{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:8px;}
+.faq-q{font-size:14px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.faq-q::before{content:'Q';background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.6;}
+.math-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:32px;}
+.math-title{font-size:13px;font-weight:700;margin-bottom:12px;color:var(--al);}
+.math-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);}
+.math-row:last-child{border:none;font-weight:700;}
+.math-label{color:var(--muted);}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal.open{display:flex;}
-.mbox{background:#12121a;border:1px solid rgba(139,92,246,0.4);border-radius:16px;padding:24px;width:100%;max-width:400px;position:relative;}
-.mclose{position:absolute;top:12px;right:12px;background:none;border:none;color:#8888aa;cursor:pointer;font-size:22px;}
+.mbox{background:var(--s1);border:1px solid var(--glow);border-radius:16px;padding:24px;width:100%;max-width:420px;position:relative;max-height:90vh;overflow-y:auto;}
+.mclose{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;}
 .mh{font-size:18px;font-weight:700;margin-bottom:16px;}
-.mrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;}
-.ml{color:#8888aa;}.mv{font-weight:600;}
-.mv.g{color:#10b981;}.mv.gold{color:#f59e0b;}.mv.a{color:#a78bfa;}
-.mbox2{background:#1a1a26;border-radius:8px;padding:12px;margin:12px 0;border:1px solid rgba(255,255,255,0.06);}
-.mbt{font-size:10px;text-transform:uppercase;color:#8888aa;margin-bottom:8px;}
+.mrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.ml{color:var(--muted);}.mv{font-weight:600;}
+.mv.g{color:var(--green);}.mv.gold{color:var(--gold);}.mv.a{color:var(--al);}
+.mbox2{background:var(--s2);border-radius:8px;padding:12px;margin:12px 0;border:1px solid var(--border);}
+.mbt{font-size:10px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px;}
 .mpr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
-.bd{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(239,68,68,0.15);color:#ef4444;}
-.bw{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,0.15);color:#f59e0b;}
-.cfmbtn{width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:#7c3aed;color:#fff;margin-top:14px;transition:background 0.2s;}
+.bd{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(239,68,68,0.15);color:var(--red);}
+.bw{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,0.15);color:var(--gold);}
+.cfmbtn{width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:var(--accent);color:#fff;margin-top:14px;transition:background 0.2s;}
 .cfmbtn:hover{background:#6d28d9;}
-.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#f59e0b;margin-bottom:12px;}
-.toast{position:fixed;bottom:20px;right:20px;background:#1a1a26;border:1px solid #10b981;color:#10b981;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all 0.3s;pointer-events:none;max-width:340px;}
+.cfmbtn:disabled{background:var(--s2);color:var(--muted);cursor:wait;}
+.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:12px;}
+.ticket-preview{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;margin:12px 0;}
+.tp-title{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;}
+.tp-num{font-size:32px;font-weight:800;color:var(--al);text-align:center;padding:8px 0;}
+.tp-sub{font-size:11px;color:var(--muted);text-align:center;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s2);border:1px solid var(--green);color:var(--green);padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all 0.3s;pointer-events:none;max-width:360px;}
 .toast.show{opacity:1;transform:translateY(0);}
-.toast.err{border-color:#ef4444;color:#ef4444;}
+.toast.err{border-color:var(--red);color:var(--red);}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="logo">Asusu<span>AI</span></div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <span style="font-size:12px;color:#8888aa;" id="bal"></span>
+  <div class="nav-links">
+    <button class="nl active" onclick="showPage('pools',this)">Pools</button>
+    <button class="nl" onclick="showPage('tickets',this)">My Tickets</button>
+    <button class="nl" onclick="showPage('winners',this)">Winners</button>
+    <button class="nl" onclick="showPage('howto',this)">How to Play</button>
+  </div>
+  <div class="nav-right">
+    <span class="bal" id="bal"></span>
     <button class="wbtn" id="wb" onclick="connectWallet()">Connect Phantom</button>
   </div>
 </nav>
 
-<div class="hero">
-  <div class="badge"><div class="dot"></div>AI-controlled &middot; Solana Devnet &middot; Fully autonomous</div>
-  <h1>Fair pools.<br>AI-picked winners.</h1>
-  <div class="sub">Join a pool &mdash; AI picks winners on-chain &mdash; funds distribute automatically</div>
-  <div class="notice">Connect your Phantom wallet to join pools with real devnet SOL</div>
-</div>
-
-<div class="stats">
-  <div class="stat"><div class="sv g">2,847 SOL</div><div class="sl">Total pooled</div></div>
-  <div class="stat"><div class="sv a">4,219</div><div class="sl">Participants</div></div>
-  <div class="stat"><div class="sv gold">1,033</div><div class="sl">Winners paid</div></div>
-  <div class="stat"><div class="sv g">100%</div><div class="sl">Autonomous</div></div>
-</div>
-
-<div class="main">
-  <div class="sh">Active pools</div>
-  <div class="grid" id="poolsGrid"></div>
-  <div class="sh">How it works</div>
-  <div class="steps">
-    <div class="step"><div class="sn">Step 01</div><div class="st">Connect Phantom</div><div class="sd">Connect your Solana wallet. Get free devnet SOL from faucet.solana.com to test.</div></div>
-    <div class="step"><div class="sn">Step 02</div><div class="st">Join a pool</div><div class="sd">Your SOL locks in the smart contract vault. Nobody can touch it manually.</div></div>
-    <div class="step"><div class="sn">Step 03</div><div class="st">AI picks winners</div><div class="sd">Once the pool fills, AI generates a verifiable random seed and selects winners on-chain.</div></div>
-    <div class="step"><div class="sn">Step 04</div><div class="st">Auto distribution</div><div class="sd">80% goes to winners, 20% to dev treasury — executed automatically by the contract.</div></div>
+<!-- POOLS PAGE -->
+<div class="page active" id="page-pools">
+  <div class="hero">
+    <div class="badge"><div class="dot"></div>AI-controlled &middot; Solana Devnet &middot; Fully autonomous</div>
+    <h1>Fair pools.<br>AI-picked winners.</h1>
+    <div class="sub">Join a pool &mdash; get a ticket &mdash; AI picks winners on-chain &mdash; funds auto-distribute</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sv g">2,847 SOL</div><div class="sl">Total pooled</div></div>
+    <div class="stat"><div class="sv a">4,219</div><div class="sl">Participants</div></div>
+    <div class="stat"><div class="sv gold">1,033</div><div class="sl">Winners paid</div></div>
+    <div class="stat"><div class="sv g">100%</div><div class="sl">Autonomous</div></div>
+  </div>
+  <div class="main">
+    <div class="sh">Active pools</div>
+    <div class="grid" id="poolsGrid"></div>
   </div>
 </div>
 
+<!-- TICKETS PAGE -->
+<div class="page" id="page-tickets">
+  <div class="main" style="padding-top:32px;">
+    <div class="sh">My tickets</div>
+    <div class="ticket-grid" id="ticketGrid"></div>
+  </div>
+</div>
+
+<!-- WINNERS PAGE -->
+<div class="page" id="page-winners">
+  <div class="main" style="padding-top:32px;">
+    <div class="sh">Winners hall of fame</div>
+    <div class="winners-stats">
+      <div class="wstat"><div class="wstat-val" style="color:var(--gold);">1,033</div><div class="wstat-label">Total winners</div></div>
+      <div class="wstat"><div class="wstat-val" style="color:var(--green);">8,264 SOL</div><div class="wstat-label">Total paid out</div></div>
+      <div class="wstat"><div class="wstat-val" style="color:var(--al);">2.67 SOL</div><div class="wstat-label">Avg. payout</div></div>
+      <div class="wstat"><div class="wstat-val" style="color:#fff;">14 min</div><div class="wstat-label">Avg. draw time</div></div>
+    </div>
+    <table class="winners-table">
+      <thead>
+        <tr>
+          <th>Ticket #</th>
+          <th>Wallet</th>
+          <th>Pool</th>
+          <th>Won</th>
+          <th>Date</th>
+          <th>Transaction</th>
+        </tr>
+      </thead>
+      <tbody id="winnersBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HOW TO PLAY PAGE -->
+<div class="page" id="page-howto">
+  <div class="main" style="padding-top:32px;">
+    <div class="how-hero">
+      <h2>How AsusuAI works</h2>
+      <p>A fully transparent, AI-controlled pool system inspired by traditional rotating savings groups — but trustless, autonomous, and on the blockchain.</p>
+    </div>
+
+    <div class="sh">Step by step</div>
+    <div class="steps-big">
+      <div class="step-big">
+        <div class="step-num-big">01</div>
+        <div class="step-icon-big">&#128274;</div>
+        <div class="step-title-big">Connect your wallet</div>
+        <div class="step-desc-big">Install Phantom from phantom.app. Get free devnet SOL from faucet.solana.com. Connect your wallet by clicking the button in the top right.</div>
+      </div>
+      <div class="step-big">
+        <div class="step-num-big">02</div>
+        <div class="step-icon-big">&#127915;</div>
+        <div class="step-title-big">Choose a pool</div>
+        <div class="step-desc-big">Pick a pool tier that suits you. Entry costs range from 0.1 SOL to 2 SOL. Each pool has a fixed number of slots and winners.</div>
+      </div>
+      <div class="step-big">
+        <div class="step-num-big">03</div>
+        <div class="step-icon-big">&#127914;</div>
+        <div class="step-title-big">Get your ticket</div>
+        <div class="step-desc-big">When you join, you get a unique ticket number. Your funds lock immediately in the smart contract vault. Nobody can touch them — not even us.</div>
+      </div>
+      <div class="step-big">
+        <div class="step-num-big">04</div>
+        <div class="step-icon-big">&#129504;</div>
+        <div class="step-title-big">AI draws winners</div>
+        <div class="step-desc-big">Once the pool is full, the AI generates a verifiable random seed on-chain. Anyone can verify it was fair. Winners are selected transparently.</div>
+      </div>
+      <div class="step-big">
+        <div class="step-num-big">05</div>
+        <div class="step-icon-big">&#128176;</div>
+        <div class="step-title-big">Automatic payout</div>
+        <div class="step-desc-big">80% of the pool splits equally among winners. 20% goes to the developer treasury. All sent automatically by the contract — no human trigger needed.</div>
+      </div>
+    </div>
+
+    <div class="sh">Prize distribution example</div>
+    <div class="math-box">
+      <div class="math-title">Example: Starter Pool (10 players x 0.1 SOL)</div>
+      <div class="math-row"><span class="math-label">Total pool collected</span><span>1.0 SOL</span></div>
+      <div class="math-row"><span class="math-label">Developer fee (20%)</span><span style="color:var(--red);">0.2 SOL</span></div>
+      <div class="math-row"><span class="math-label">Prize pool (80%)</span><span style="color:var(--green);">0.8 SOL</span></div>
+      <div class="math-row"><span class="math-label">Number of winners</span><span>3</span></div>
+      <div class="math-row"><span class="math-label" style="color:var(--gold);">Each winner receives</span><span style="color:var(--gold);">0.267 SOL (2.67x your entry)</span></div>
+    </div>
+
+    <div class="sh">Frequently asked questions</div>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">Can the dev team steal my funds?</div>
+        <div class="faq-a">No. Once you join a pool your SOL goes into a smart contract vault. The contract code is the only thing that can move those funds — and it only moves them to winners and the dev treasury after a draw. Nobody has a private key to that vault.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do I know the winner selection is fair?</div>
+        <div class="faq-a">The AI uses a Verifiable Random Function (VRF) to generate the winning seed. The seed is published on-chain so anyone can independently verify it wasn't manipulated. You can check every draw on Solana Explorer.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens if a pool never fills up?</div>
+        <div class="faq-a">If a pool doesn't fill by the draw timestamp, a refund mechanism triggers and all participants get their SOL back automatically. This will be implemented before mainnet launch.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I join multiple pools?</div>
+        <div class="faq-a">Yes. You can join as many different pools as you like. You cannot join the same pool twice with the same wallet — this prevents anyone from buying unfair advantages.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">When does the pool draw happen?</div>
+        <div class="faq-a">A draw triggers automatically when either the pool fills all its slots OR the countdown timer reaches zero — whichever comes first. The AI then immediately selects winners and distributes funds.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is this on mainnet yet?</div>
+        <div class="faq-a">No. AsusuAI is currently on Solana Devnet for testing only. Use free devnet SOL from faucet.solana.com. Mainnet launch will follow a full security audit.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="mbox">
     <button class="mclose" onclick="closeModal()">&times;</button>
@@ -137,13 +331,30 @@ const pools = [
   {id:4,tier:"Whale",  tc:"t4",fc:"f4",entry:2,  slots:5, filled:1,winners:2,status:"open",tl:47*3600},
 ];
 
+const mockWinners = [
+  {ticket:"#047",addr:"3Xkp...7mR2",pool:"Starter",amount:"0.267 SOL",date:"Jun 26 2026",tx:"4xKp2..."},
+  {ticket:"#012",addr:"Bq9a...1vT8",pool:"Growth", amount:"1.00 SOL", date:"Jun 25 2026",tx:"7mNq3..."},
+  {ticket:"#089",addr:"Zu4w...8nK0",pool:"Elite",  amount:"2.13 SOL", date:"Jun 25 2026",tx:"2pRs8..."},
+  {ticket:"#003",addr:"Fy7c...3xP1",pool:"Whale",  amount:"6.40 SOL", date:"Jun 24 2026",tx:"9tWx4..."},
+  {ticket:"#156",addr:"Kn2m...5vQ8",pool:"Starter",amount:"0.267 SOL",date:"Jun 24 2026",tx:"1yBz6..."},
+  {ticket:"#023",addr:"Pt8r...2hD4",pool:"Growth", amount:"1.00 SOL", date:"Jun 23 2026",tx:"8cFg7..."},
+  {ticket:"#071",addr:"Wx5j...9kL6",pool:"Elite",  amount:"2.13 SOL", date:"Jun 23 2026",tx:"3nHm5..."},
+  {ticket:"#038",addr:"Qr1p...4sN7",pool:"Starter",amount:"0.267 SOL",date:"Jun 22 2026",tx:"6vJk9..."},
+];
+
 const timers = {};
 let wpk = null;
 let cpPool = null;
 
-function fmt(s) {
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sc = s%60;
-  return h+"h "+String(m).padStart(2,"0")+"m "+String(sc).padStart(2,"0")+"s";
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return h+"h "+String(m).padStart(2,"0")+"m "+String(sc).padStart(2,"0")+"s";}
+
+function showPage(name, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nl").forEach(b => b.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  if(btn) btn.classList.add("active");
+  if(name === "tickets") renderTickets();
+  if(name === "winners") renderWinners();
 }
 
 function render() {
@@ -155,7 +366,7 @@ function render() {
     const pw = +((total*0.8)/p.winners).toFixed(2);
     const roi = Math.round(((pw-p.entry)/p.entry)*100);
     const d = document.createElement("div");
-    d.className = "card " + p.tc;
+    d.className = "card "+p.tc;
     d.innerHTML = `
       <div class="ch">
         <div><div class="ct">${p.tier} pool</div><div class="ca">${p.entry} <span>SOL</span></div></div>
@@ -169,26 +380,77 @@ function render() {
         <div class="chip gr">+${roi}% ROI</div>
       </div>
       <div class="tm">Draws in: <span class="tc" id="t${p.id}">${fmt(p.tl)}</span></div>
-      <button class="jbtn" onclick="openModal(${p.id})">Join pool — ${p.entry} SOL</button>
+      <button class="jbtn" onclick="openModal(${p.id})">Get ticket — ${p.entry} SOL</button>
     `;
     g.appendChild(d);
-    if (timers[p.id]) clearInterval(timers[p.id]);
+    if(timers[p.id]) clearInterval(timers[p.id]);
     timers[p.id] = setInterval(() => {
-      if (p.tl > 0) { p.tl--; const e = document.getElementById("t"+p.id); if(e) e.textContent = fmt(p.tl); }
+      if(p.tl > 0){ p.tl--; const e = document.getElementById("t"+p.id); if(e) e.textContent = fmt(p.tl); }
     }, 1000);
   });
 }
 
+function renderTickets() {
+  const g = document.getElementById("ticketGrid");
+  const tickets = getTickets();
+  if(tickets.length === 0) {
+    g.innerHTML = `<div class="empty-state"><div class="big">&#127914;</div><p>You don't have any tickets yet.<br>Join a pool to get your first ticket.</p></div>`;
+    return;
+  }
+  g.innerHTML = "";
+  tickets.forEach(t => {
+    const pool = pools.find(p => p.id === t.poolId);
+    const d = document.createElement("div");
+    d.className = "ticket active-t";
+    d.innerHTML = `
+      <div class="ticket-num">${t.ticketNum}</div>
+      <div class="ticket-label">AsusuAI ticket</div>
+      <div class="ticket-row"><span class="tr-label">Pool</span><span class="tr-val">${pool ? pool.tier : t.poolTier}</span></div>
+      <div class="ticket-row"><span class="tr-label">Entry paid</span><span class="tr-val">${t.entry} SOL</span></div>
+      <div class="ticket-row"><span class="tr-label">Joined</span><span class="tr-val">${t.date}</span></div>
+      <div class="ticket-row"><span class="tr-label">Wallet</span><span class="tr-val" style="font-family:monospace;font-size:11px;color:var(--al);">${t.wallet.slice(0,4)}...${t.wallet.slice(-4)}</span></div>
+      <div class="ticket-status ts-active"><div class="dot"></div>Active — awaiting draw</div>
+    `;
+    g.appendChild(d);
+  });
+}
+
+function renderWinners() {
+  const tbody = document.getElementById("winnersBody");
+  const poolBadgeClass = {Starter:"pb-starter",Growth:"pb-growth",Elite:"pb-elite",Whale:"pb-whale"};
+  tbody.innerHTML = mockWinners.map(w => `
+    <tr>
+      <td style="font-weight:700;color:var(--al);">${w.ticket}</td>
+      <td class="addr">${w.addr}</td>
+      <td><span class="pool-badge ${poolBadgeClass[w.pool]||"pb-starter"}">${w.pool}</span></td>
+      <td class="amount-win">${w.amount}</td>
+      <td style="color:var(--muted);">${w.date}</td>
+      <td><a href="https://explorer.solana.com/tx/${w.tx}?cluster=devnet" target="_blank" class="tx-link">${w.tx} &#8599;</a></td>
+    </tr>
+  `).join("");
+}
+
+function getTickets() {
+  try { return JSON.parse(localStorage.getItem("asusuai_tickets") || "[]"); } catch(e){ return []; }
+}
+
+function saveTicket(ticket) {
+  const tickets = getTickets();
+  tickets.push(ticket);
+  localStorage.setItem("asusuai_tickets", JSON.stringify(tickets));
+}
+
 function openModal(id) {
   cpPool = pools.find(p => p.id === id);
-  if (!cpPool) return;
+  if(!cpPool) return;
   const p = cpPool;
   const total = +(p.entry*p.slots).toFixed(2);
   const dev = +(total*0.2).toFixed(2);
   const prize = +(total*0.8).toFixed(2);
   const pw = +(prize/p.winners).toFixed(2);
   const odds = Math.round((p.winners/p.slots)*100);
-  document.getElementById("mTitle").textContent = p.tier+" pool — "+p.entry+" SOL entry";
+  const nextTicket = "#" + String(Math.floor(Math.random()*900)+100);
+  document.getElementById("mTitle").textContent = p.tier+" pool — "+p.entry+" SOL";
   document.getElementById("mContent").innerHTML = `
     ${!wpk ? '<div class="warn">Connect your Phantom wallet first to join.</div>' : ""}
     <div class="mrow"><span class="ml">Entry cost</span><span class="mv">${p.entry} SOL</span></div>
@@ -197,15 +459,17 @@ function openModal(id) {
     <div class="mrow"><span class="ml">Win chance</span><span class="mv g">${odds}%</span></div>
     <div class="mrow"><span class="ml">If you win</span><span class="mv gold">${pw} SOL</span></div>
     <div class="mbox2">
-      <div class="mbt">Prize distribution</div>
-      <div class="mpr"><span style="color:#8888aa;display:flex;align-items:center;gap:6px;"><span class="bd">20%</span>Dev treasury</span><span>${dev} SOL</span></div>
-      <div class="mpr"><span style="color:#8888aa;display:flex;align-items:center;gap:6px;"><span class="bw">80%</span>Winners</span><span>${prize} SOL</span></div>
-      <div class="mpr" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:6px;margin-top:4px;">
-        <span style="color:#f59e0b;font-weight:600;">Each winner gets</span>
-        <span style="color:#f59e0b;font-weight:700;">${pw} SOL</span>
-      </div>
+      <div class="mbt">Your ticket preview</div>
+      <div class="tp-num">${nextTicket}</div>
+      <div class="tp-sub">This will be your ticket number in the ${p.tier} pool</div>
     </div>
-    <p style="font-size:11px;color:#8888aa;">Funds are locked in the smart contract. No one can withdraw manually.</p>
+    <div class="mbox2">
+      <div class="mbt">Prize distribution</div>
+      <div class="mpr"><span style="color:var(--muted);display:flex;align-items:center;gap:6px;"><span class="bd">20%</span>Dev treasury</span><span>${dev} SOL</span></div>
+      <div class="mpr"><span style="color:var(--muted);display:flex;align-items:center;gap:6px;"><span class="bw">80%</span>Winners</span><span>${prize} SOL</span></div>
+      <div class="mpr" style="border-top:1px solid var(--border);padding-top:6px;margin-top:4px;"><span style="color:var(--gold);font-weight:600;">Each winner gets</span><span style="color:var(--gold);font-weight:700;">${pw} SOL</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);">Funds lock in smart contract. No manual withdrawal possible.</p>
   `;
   document.getElementById("modal").classList.add("open");
 }
@@ -216,17 +480,14 @@ function closeModal() {
 }
 
 function getProvider() {
-  if (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom) return window.phantom.solana;
-  if (window.solana && window.solana.isPhantom) return window.solana;
+  if(window.phantom && window.phantom.solana && window.phantom.solana.isPhantom) return window.phantom.solana;
+  if(window.solana && window.solana.isPhantom) return window.solana;
   return null;
 }
 
 async function connectWallet() {
   const provider = getProvider();
-  if (!provider) {
-    showToast("Phantom not found. Please install from phantom.app", true);
-    return;
-  }
+  if(!provider){ showToast("Phantom not found. Install from phantom.app", true); return; }
   try {
     const resp = await provider.connect();
     wpk = resp.publicKey;
@@ -235,63 +496,57 @@ async function connectWallet() {
     document.getElementById("wb").classList.add("on");
     showToast("Wallet connected!");
     updateBalance();
-  } catch(e) {
-    showToast("Connection failed: "+e.message, true);
-  }
+  } catch(e){ showToast("Failed: "+e.message, true); }
 }
 
 async function updateBalance() {
-  if (!wpk) return;
+  if(!wpk) return;
   try {
-    const res = await fetch(DEVNET, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({jsonrpc:"2.0",id:1,method:"getBalance",params:[wpk.toString()]})
-    });
+    const res = await fetch(DEVNET, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"getBalance",params:[wpk.toString()]})});
     const data = await res.json();
-    const sol = (data.result.value / 1000000000).toFixed(3);
-    document.getElementById("bal").textContent = sol + " SOL";
-  } catch(e) {}
+    document.getElementById("bal").textContent = (data.result.value/1e9).toFixed(3)+" SOL";
+  } catch(e){}
 }
 
 async function joinPool() {
-  if (!wpk) { await connectWallet(); return; }
-  if (!cpPool) return;
-
+  if(!wpk){ await connectWallet(); return; }
+  if(!cpPool) return;
   const btn = document.getElementById("cfmbtn");
-  btn.textContent = "Sending...";
+  btn.textContent = "Sending transaction...";
   btn.disabled = true;
-
   try {
     const provider = getProvider();
     const connection = new solanaWeb3.Connection(DEVNET, "confirmed");
     const fromPubkey = new solanaWeb3.PublicKey(wpk.toString());
     const toPubkey = new solanaWeb3.PublicKey(VAULT);
-    const lamports = Math.round(cpPool.entry * 1000000000);
-
+    const lamports = Math.round(cpPool.entry * 1e9);
     const transaction = new solanaWeb3.Transaction().add(
-      solanaWeb3.SystemProgram.transfer({ fromPubkey, toPubkey, lamports })
+      solanaWeb3.SystemProgram.transfer({fromPubkey, toPubkey, lamports})
     );
-
-    const { blockhash } = await connection.getLatestBlockhash();
+    const {blockhash} = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = fromPubkey;
-
     const signed = await provider.signAndSendTransaction(transaction);
     const sig = signed.signature;
-
+    const ticketNum = "#" + String(Math.floor(Math.random()*900)+100);
+    saveTicket({
+      ticketNum,
+      poolId: cpPool.id,
+      poolTier: cpPool.tier,
+      entry: cpPool.entry,
+      wallet: wpk.toString(),
+      date: new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}),
+      tx: sig
+    });
     const pool = pools.find(p => p.id === cpPool.id);
-    if (pool && pool.filled < pool.slots) pool.filled++;
-
+    if(pool && pool.filled < pool.slots) pool.filled++;
     closeModal();
     render();
-    showToast("Joined! View at explorer.solana.com/tx/"+sig+"?cluster=devnet");
+    showToast("Joined! Ticket "+ticketNum+" saved. View in My Tickets.");
     updateBalance();
-
-  } catch(e) {
-    showToast("Failed: " + e.message, true);
+  } catch(e){
+    showToast("Failed: "+e.message, true);
   }
-
   btn.textContent = "Confirm & join pool";
   btn.disabled = false;
 }
@@ -299,24 +554,25 @@ async function joinPool() {
 function showToast(msg, err=false) {
   const t = document.getElementById("toast");
   t.textContent = msg;
-  t.className = "toast show" + (err ? " err" : "");
-  setTimeout(() => { t.className = "toast"; }, 5000);
+  t.className = "toast show"+(err?" err":"");
+  setTimeout(()=>{ t.className="toast"; }, 5000);
 }
 
-document.getElementById("modal").addEventListener("click", function(e) { if(e.target===this) closeModal(); });
+document.getElementById("modal").addEventListener("click", function(e){ if(e.target===this) closeModal(); });
 
 window.addEventListener("load", async () => {
   render();
+  renderWinners();
   const provider = getProvider();
-  if (provider) {
-    try {
-      const resp = await provider.connect({onlyIfTrusted: true});
+  if(provider){
+    try{
+      const resp = await provider.connect({onlyIfTrusted:true});
       wpk = resp.publicKey;
       const addr = wpk.toString();
       document.getElementById("wb").textContent = addr.slice(0,4)+"..."+addr.slice(-4);
       document.getElementById("wb").classList.add("on");
       updateBalance();
-    } catch(e) {}
+    } catch(e){}
   }
 });
 </script>
